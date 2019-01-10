@@ -45,7 +45,7 @@ echo "major version: $MONO_MAJOR_VER"
 echo "minor version: $MONO_MINOR_VER"
 
 rm -rf "$WORK_DIR"
-rm -rf "$OUT_DIR"
+rm -rf "$OUT_DIR/*"
 
 mkdir -p "$WORK_DIR"
 mkdir -p "$OUT_DIR"
