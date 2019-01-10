@@ -10,4 +10,5 @@ MONO_SRPM="${MONO_SRPMS[0]}"
 
 echo "Building RPM packages from SRPM $MONO_SRPM"
 
-mock -r epel-7-x86_64 --resultdir="$OUT_DIR" "$MONO_SRPM"
+# mock --new-chroot (which is the default) uses systemd-nspawn which does not work in docker
+mock -r epel-7-x86_64 --old-chroot --resultdir="$OUT_DIR" "$MONO_SRPM"
