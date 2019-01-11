@@ -1,0 +1,5 @@
+[centos7-bars-mono]
+name=centos7-bars-mono
+baseurl=https://alpha-dev.bars-open.ru/centos7-bars-mono-repo/
+enabled=1
+gpgcheck=0
