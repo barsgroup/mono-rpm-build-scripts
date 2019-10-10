@@ -41,7 +41,7 @@ OUT_DIR="$SCRIPT_DIR/out"
 rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR"
 
-docker run --rm -it -v "$MONO_DIR":/work/mono-src -v "$XSP_DIR":/work/xsp-src -v "$SCRIPT_DIR":/work/scripts centos:7 sh -c '
+docker run --rm -v "$MONO_DIR":/work/mono-src -v "$XSP_DIR":/work/xsp-src -v "$SCRIPT_DIR":/work/scripts centos:7 sh -c '
 yum -y install epel-release &&
 yum -y install git make bzip2 rpm-build wget &&
 /work/scripts/make-mono-srpm-from-git-checkout.sh /work/mono-src &&
