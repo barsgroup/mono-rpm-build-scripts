@@ -51,7 +51,7 @@ rpmbuild --rebuild /work/scripts/out/mono-core-*.src.rpm &&
 /work/scripts/download-mono-binary-packages.sh &&
 cp -v ~/rpmbuild/RPMS/x86_64/*.rpm /work/scripts/out/ &&
 rm -rf ~/rpmbuild/ &&
-yum -y install /work/scripts/out/*.x86_64.rpm &&
+yum -y install /work/scripts/out/*.{x86_64,noarch}.rpm &&
 yum-builddep -y /work/scripts/out/xsp-*.src.rpm &&
 rpmbuild --rebuild /work/scripts/out/xsp-*.src.rpm &&
 cp -v ~/rpmbuild/RPMS/x86_64/*.rpm /work/scripts/out/ &&

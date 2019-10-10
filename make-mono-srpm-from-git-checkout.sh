@@ -75,7 +75,7 @@ mkdir -p "$SRC_TAR_DIR"
 (
     cd "$MONO_DIR" &&
 
-    # next two commands create .tar.bz2 from git repository with recursive submodules
+    # next two commands create .tar.xz from git repository with recursive submodules
     git archive --format tar HEAD | (cd "$SRC_TAR_DIR" && tar xf -) &&
     git submodule status --recursive | awk '{print $2}' |
         while read DIR; do
@@ -87,10 +87,10 @@ mkdir -p "$SRC_TAR_DIR"
 
 (
     cd "$WORK_DIR/srcbuild" &&
-    tar cjf "mono-$MONO_MAJOR_VER.$MONO_MINOR_VER.tar.bz2" "mono-$MONO_MAJOR_VER.$MONO_MINOR_VER"
+    XZ_OPT="-2 -T 0" tar cJf "mono-$MONO_MAJOR_VER.$MONO_MINOR_VER.tar.xz" "mono-$MONO_MAJOR_VER.$MONO_MINOR_VER"
 )
 
-cp "$WORK_DIR/srcbuild/mono-$MONO_MAJOR_VER.$MONO_MINOR_VER.tar.bz2" "$WORK_DIR/linux-packaging-mono/mono-$MONO_MAJOR_VER.$MONO_MINOR_VER.tar.bz2"
+cp "$WORK_DIR/srcbuild/mono-$MONO_MAJOR_VER.$MONO_MINOR_VER.tar.xz" "$WORK_DIR/linux-packaging-mono/mono-$MONO_MAJOR_VER.$MONO_MINOR_VER.tar.xz"
 
 (
     cd "$WORK_DIR/linux-packaging-mono" &&

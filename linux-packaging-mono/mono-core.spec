@@ -26,16 +26,17 @@
 %undefine _missing_build_ids_terminate_build
 
 Name:           mono-core
-%define __majorver 5.23.0
-%define __minorver 61
+%define __majorver 6.0.0
+%define __minorver 294
 Version:	%{__majorver}.%{__minorver}
-Release:	0.nightly.1
+Release:	0.xamarin.1
 Summary:        Cross-platform, Open Source, .NET development framework
 License:        LGPL-2.1 and MIT and MS-PL
 Group:          Development/Languages/Mono
 Url:            http://www.mono-project.com
-Source0:        http://download.mono-project.com/sources/mono/mono-%{version}.tar.bz2
+Source0:        http://download.mono-project.com/sources/mono/mono-%{version}.tar.xz
 Patch0:		llvm_llc_opt_default_path.patch
+Patch1:		use_python3_not_unversioned.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -44,6 +45,10 @@ BuildRequires:  cmake
 BuildRequires:  gettext
 BuildRequires:  fdupes
 BuildRequires:  gcc-c++
+%if 0%{?rhel} >= 8
+BuildRequires:	python36
+%define __python3 /usr/bin/python3
+%endif
 %if 0%{?rhel} < 7
 BuildRequires:  devtoolset-2-toolchain
 %endif
@@ -116,13 +121,15 @@ Provides:       mono(mscorlib) = 2.0.0.0
 Provides:       mono(mscorlib) = 4.0.0.0
 Provides:	mono(Mono.Configuration.Crypto) = 4.0.0.0
 
+%define debug_package %{nil}
+
 %define _use_internal_dependency_generator 0
 %if 0%{?fedora} || 0%{?rhel} || 0%{?centos}
 %define __find_provides env sh -c 'filelist=($(cat)) && { printf "%s\\n" "${filelist[@]}" | /usr/lib/rpm/redhat/find-provides && printf "%s\\n" "${filelist[@]}" | prefix=%{buildroot}%{_prefix} %{buildroot}%{_bindir}/mono-find-provides; } | sort | uniq'
-%define __find_requires env sh -c 'filelist=($(cat)) && { printf "%s\\n" "${filelist[@]}" | /usr/lib/rpm/redhat/find-requires && printf "%s\\n" "${filelist[@]}" | prefix=%{buildroot}%{_prefix} %{buildroot}%{_bindir}/mono-find-requires; } | grep -v "Mono.Configuration.Crypto" | sort | uniq | grep ^... | sed "s/mono\(System.IO.Compression\).*/mono\(System.IO.Compression\) = 4.0.0.0/" | sed "s/mono\(System.Text.Encoding.CodePages\).*/mono\(System.Text.Encoding.CodePages\) = 4.1.0.0/" | sed "s/mono\(System.Security.Cryptography.Algorithms\).*/mono\(System.Security.Cryptography.Algorithms\) = 4.3.1.0/" | sed "s/mono\(System.Collections.Immutable\).*/mono\(System.Collections.Immutable\) = 1.2.1.0/" | sed "s/mono\(System.Xml.XPath.XDocument\).*/mono\(System.Xml.XPath.XDocument\) = 4.1.1.0/" | sed "s/mono\(System.ValueTuple\).*/mono\(System.ValueTuple\) = 4.0.3.0/" | sed "s/mono\(System.Xml.ReaderWriter\).*/mono\(System.Xml.ReaderWriter\) = 4.0.0.0/" | grep -v "System.Runtime.InteropServices.RuntimeInformation" | grep -v "System.Diagnostics.StackTrace" | grep -v "System.Runtime.Loader" | grep -v "System.Security.AccessControl" | grep -v "System.Diagnostics.Process" | grep -v "System.IO.Pipes.AccessControl" | grep -v "System.Security.Principal.Windows" | grep -v "System.Collection" | grep -v "System.Diagnostics.Debug" | grep -v "System.Globalization" | grep -v "System.IO" | grep -v "System.Linq" | grep -v "System.Linq.Expressions" | grep -v "System.Reflection" | grep -v "System.Runtime" | grep -v "System.Runtime.Extensions" | grep -v "System.Runtime.InteropServices" | grep -v "System.Text.Encoding" | grep -v "System.Text.Encoding.Extensions" | grep -v "System.Threading" | grep -v "System.IO.Pipes.AccessControl" | grep -v "Mono.Cecil"''
+%define __find_requires env sh -c 'filelist=($(cat)) && { printf "%s\\n" "${filelist[@]}" | /usr/lib/rpm/redhat/find-requires && printf "%s\\n" "${filelist[@]}" | prefix=%{buildroot}%{_prefix} %{buildroot}%{_bindir}/mono-find-requires; } | grep -v "Mono.Configuration.Crypto" | sort | uniq | grep ^... | sed "s/mono\(System.IO.Compression\).*/mono\(System.IO.Compression\) = 4.0.0.0/" | sed "s/mono\(System.Text.Encoding.CodePages\).*/mono\(System.Text.Encoding.CodePages\) = 4.1.0.0/" | sed "s/mono\(System.Security.Cryptography.Algorithms\).*/mono\(System.Security.Cryptography.Algorithms\) = 4.3.1.0/" | sed "s/mono\(System.Collections.Immutable\).*/mono\(System.Collections.Immutable\) = 1.2.1.0/" | sed "s/mono\(System.Xml.XPath.XDocument\).*/mono\(System.Xml.XPath.XDocument\) = 4.1.1.0/" | sed "s/mono\(System.ValueTuple\).*/mono\(System.ValueTuple\) = 4.0.3.0/" | sed "s/mono\(System.Xml.ReaderWriter\).*/mono\(System.Xml.ReaderWriter\) = 4.0.0.0/" | grep -v "System.Runtime.InteropServices.RuntimeInformation" | grep -v "System.Diagnostics.StackTrace" | grep -v "System.Runtime.Loader" | grep -v "System.Security.AccessControl" | grep -v "System.Diagnostics.Process" | grep -v "System.IO.Pipes.AccessControl" | grep -v "System.Security.Principal.Windows" | grep -v "System.Collection" | grep -v "System.Diagnostics.Debug" | grep -v "System.Globalization" | grep -v "System.IO" | grep -v "System.Linq" | grep -v "System.Linq.Expressions" | grep -v "System.Reflection" | grep -v "System.Runtime" | grep -v "System.Runtime.Extensions" | grep -v "System.Runtime.InteropServices" | grep -v "System.Text.Encoding" | grep -v "System.Text.Encoding.Extensions" | grep -v "System.Threading" | grep -v "System.Numerics.Vectors" | grep -v "System.Buffers" | grep -v "Mono.Cecil" '
 %else
 %define __find_provides env sh -c 'filelist=($(cat)) && { printf "%s\\n" "${filelist[@]}" | /usr/lib/rpm/find-provides && printf "%s\\n" "${filelist[@]}" | prefix=%{buildroot}%{_prefix} %{buildroot}%{_bindir}/mono-find-provides; } | sort | uniq'
-%define __find_requires env sh -c 'filelist=($(cat)) && { printf "%s\\n" "${filelist[@]}" | /usr/lib/rpm/find-requires && printf "%s\\n" "${filelist[@]}" | prefix=%{buildroot}%{_prefix} %{buildroot}%{_bindir}/mono-find-requires; } | grep -v "Mono.Configuration.Crypto" | sort | uniq | grep ^... | sed "s/mono\(System.IO.Compression\).*/mono\(System.IO.Compression\) = 4.0.0.0/" | sed "s/mono\(System.Text.Encoding.CodePages\).*/mono\(System.Text.Encoding.CodePages\) = 4.1.0.0/" | sed "s/mono\(System.Security.Cryptography.Algorithms\).*/mono\(System.Security.Cryptography.Algorithms\) = 4.3.1.0/" | sed "s/mono\(System.Collections.Immutable\).*/mono\(System.Collections.Immutable\) = 1.2.1.0/" | sed "s/mono\(System.Xml.XPath.XDocument\).*/mono\(System.Xml.XPath.XDocument\) = 4.1.1.0/" | sed "s/mono\(System.ValueTuple\).*/mono\(System.ValueTuple\) = 4.0.3.0/" | sed "s/mono\(System.Xml.ReaderWriter\).*/mono\(System.Xml.ReaderWriter\) = 4.0.0.0/" | grep -v "System.Runtime.InteropServices.RuntimeInformation" | grep -v "System.Diagnostics.StackTrace" | grep -v "System.Runtime.Loader" | grep -v "System.Security.AccessControl" | grep -v "System.Diagnostics.Process" | grep -v "System.IO.Pipes.AccessControl | grep -v "System.Security.Principal.Windows" | grep -v "System.Collection" | grep -v "System.Diagnostics.Debug" | grep -v "System.Globalization" | grep -v "System.IO" | grep -v "System.Linq" | grep -v "System.Linq.Expressions" | grep -v "System.Reflection" | grep -v "System.Runtime" | grep -v "System.Runtime.Extensions" | grep -v "System.Runtime.InteropServices" | grep -v "System.Text.Encoding" | grep -v "System.Text.Encoding.Extensions" | grep -v "System.Threading" | grep -v "System.IO.Pipes.AccessControl" | grep -v "Mono.Cecil"'
+%define __find_requires env sh -c 'filelist=($(cat)) && { printf "%s\\n" "${filelist[@]}" | /usr/lib/rpm/find-requires && printf "%s\\n" "${filelist[@]}" | prefix=%{buildroot}%{_prefix} %{buildroot}%{_bindir}/mono-find-requires; } | grep -v "Mono.Configuration.Crypto" | sort | uniq | grep ^... | sed "s/mono\(System.IO.Compression\).*/mono\(System.IO.Compression\) = 4.0.0.0/" | sed "s/mono\(System.Text.Encoding.CodePages\).*/mono\(System.Text.Encoding.CodePages\) = 4.1.0.0/" | sed "s/mono\(System.Security.Cryptography.Algorithms\).*/mono\(System.Security.Cryptography.Algorithms\) = 4.3.1.0/" | sed "s/mono\(System.Collections.Immutable\).*/mono\(System.Collections.Immutable\) = 1.2.1.0/" | sed "s/mono\(System.Xml.XPath.XDocument\).*/mono\(System.Xml.XPath.XDocument\) = 4.1.1.0/" | sed "s/mono\(System.ValueTuple\).*/mono\(System.ValueTuple\) = 4.0.3.0/" | sed "s/mono\(System.Xml.ReaderWriter\).*/mono\(System.Xml.ReaderWriter\) = 4.0.0.0/" | grep -v "System.Runtime.InteropServices.RuntimeInformation" | grep -v "System.Diagnostics.StackTrace" | grep -v "System.Runtime.Loader" | grep -v "System.Security.AccessControl" | grep -v "System.Diagnostics.Process" | grep -v "System.IO.Pipes.AccessControl | grep -v "System.Security.Principal.Windows" | grep -v "System.Collection" | grep -v "System.Diagnostics.Debug" | grep -v "System.Globalization" | grep -v "System.IO" | grep -v "System.Linq" | grep -v "System.Linq.Expressions" | grep -v "System.Reflection" | grep -v "System.Runtime" | grep -v "System.Runtime.Extensions" | grep -v "System.Runtime.InteropServices" | grep -v "System.Text.Encoding" | grep -v "System.Text.Encoding.Extensions" | grep -v "System.Threading" | grep -v "System.Numerics.Vectors" | grep -v "System.Buffers | grep -v "Mono.Cecil" '
 %endif
 
 %description
@@ -135,6 +142,9 @@ technologies that have been submitted to the ECMA for standardization.
 %prep
 %setup -q -n mono-%{version}
 %patch0 -p1
+%if 0%{?rhel} >= 8
+%patch1 -p1
+%endif
 
 %build
 %{?scl:scl enable %{scl} - << \EOF}
@@ -167,7 +177,7 @@ export PATH=/usr/lib/mono/llvm/bin:$PATH
 %endif
   --with-ikvm=yes \
   --with-moonlight=no
-make %{?_smp_mflags}
+make
 %{?scl:EOF}
 
 %install
@@ -185,10 +195,9 @@ rm -f %{buildroot}%{_libdir}/libMonoSupportW.*
 
 # remove .a files for libraries that are really only for us
 rm -f %{buildroot}%{_libdir}/libMonoPosixHelper.a
+rm -f %{buildroot}%{_libdir}/libmono-native.a
 rm -f %{buildroot}%{_libdir}/libikvm-native.a
 rm -f %{buildroot}%{_libdir}/libmono-llvm.a
-rm -f %{buildroot}%{_libdir}/libmono-native.a
-rm -f %{buildroot}%{_libdir}/libmono-system-native.a
 
 # remove libgc cruft
 rm -rf %{buildroot}%{_datadir}/libgc-mono
@@ -252,7 +261,6 @@ rm %{buildroot}%{_bindir}/mono-sgen-gdb.py
 %{_bindir}/chktrust
 %{_bindir}/crlupdate
 %{_bindir}/csc
-%{_bindir}/csc-dim
 %{_bindir}/csi
 %{_bindir}/vbc
 %{_bindir}/csharp
@@ -349,6 +357,7 @@ rm %{buildroot}%{_bindir}/mono-sgen-gdb.py
 %{_prefix}/lib/mono/4.5/System.Dynamic.dll
 %{_prefix}/lib/mono/4.5/System.Json.dll
 %{_prefix}/lib/mono/4.5/System.Json.Microsoft.dll
+%{_prefix}/lib/mono/4.5/System.Memory.dll*
 %{_prefix}/lib/mono/4.5/System.Net.dll
 %{_prefix}/lib/mono/4.5/System.Net.Http.dll
 %{_prefix}/lib/mono/4.5/System.Net.Http.Formatting.dll
@@ -357,8 +366,10 @@ rm %{buildroot}%{_bindir}/mono-sgen-gdb.py
 %{_prefix}/lib/mono/4.5/System.Numerics.Vectors.dll
 %{_prefix}/lib/mono/4.5/System.Reflection.Context.dll
 %{_prefix}/lib/mono/4.5/System.Reflection.Metadata.dll*
+%{_prefix}/lib/mono/4.5/System.Runtime.CompilerServices.Unsafe.dll*
 %{_prefix}/lib/mono/4.5/System.Security.dll
 %{_prefix}/lib/mono/4.5/System.Threading.Tasks.Dataflow.dll
+%{_prefix}/lib/mono/4.5/System.Threading.Tasks.Extensions.dll
 %{_prefix}/lib/mono/4.5/System.Web.Mobile.dll
 %{_prefix}/lib/mono/4.5/System.Web.RegularExpressions.dll
 %{_prefix}/lib/mono/4.5/System.Workflow.Activities.dll
@@ -376,7 +387,6 @@ rm %{buildroot}%{_bindir}/mono-sgen-gdb.py
 %{_prefix}/lib/mono/4.5/Facades/System*
 %{_prefix}/lib/mono/4.5/Facades/Microsoft*
 %{_prefix}/lib/mono/4.5/Facades/netstandard*
-%{_prefix}/lib/mono/4.5/dim/*
 %{_prefix}/lib/mono/gac/Commons.Xml.Relaxng
 %{_prefix}/lib/mono/gac/CustomMarshalers
 %{_prefix}/lib/mono/gac/I18N
@@ -1062,46 +1072,6 @@ Database connectivity for Mono.
 %{_prefix}/lib/mono/4.5/System.Data.OracleClient.dll
 %{_prefix}/lib/mono/gac/System.Data.OracleClient
 
-%package -n mono-nunit
-Summary:        NUnit Testing Framework
-License:        LGPL-2.1
-Group:          Development/Languages/Mono
-Requires:       mono-core = %{version}
-
-%description -n mono-nunit
-NUnit is a unit-testing framework for all .Net languages.  Initially
-ported from JUnit, the current release, version 2.2,  is the fourth
-major release of this  Unit based unit testing tool for Microsoft .NET.
-It is written entirely in C# and  has been completely redesigned to
-take advantage of many .NET language		 features, for example
-custom attributes and other reflection related capabilities. NUnit
-brings xUnit to all .NET languages.
-
-%files -n mono-nunit
-%defattr(-, root, root)
-%{_libdir}/pkgconfig/mono-nunit.pc
-%{_bindir}/nunit-console
-%{_bindir}/nunit-console2
-%{_bindir}/nunit-console4
-%{_prefix}/lib/mono/4.5/nunit-console-runner.dll
-%{_prefix}/lib/mono/4.5/nunit-console.exe*
-%{_prefix}/lib/mono/4.5/nunit-console.pdb
-%{_prefix}/lib/mono/4.5/nunit.core.dll
-%{_prefix}/lib/mono/4.5/nunit.core.extensions.dll
-%{_prefix}/lib/mono/4.5/nunit.core.interfaces.dll
-%{_prefix}/lib/mono/4.5/nunit.framework.dll
-%{_prefix}/lib/mono/4.5/nunit.framework.extensions.dll
-%{_prefix}/lib/mono/4.5/nunit.mocks.dll
-%{_prefix}/lib/mono/4.5/nunit.util.dll
-%{_prefix}/lib/mono/gac/nunit-console-runner
-%{_prefix}/lib/mono/gac/nunit.core
-%{_prefix}/lib/mono/gac/nunit.core.extensions
-%{_prefix}/lib/mono/gac/nunit.core.interfaces
-%{_prefix}/lib/mono/gac/nunit.framework
-%{_prefix}/lib/mono/gac/nunit.framework.extensions
-%{_prefix}/lib/mono/gac/nunit.mocks
-%{_prefix}/lib/mono/gac/nunit.util
-
 %package -n mono-devel
 Summary:        Mono development tools
 License:        LGPL-2.1
@@ -1168,7 +1138,6 @@ Mono development tools.
 %{_bindir}/mono-xmltool
 %{_bindir}/monodis
 %{_bindir}/monolinker
-%{_bindir}/monograph
 %{_bindir}/monop
 %{_bindir}/monop2
 %{_bindir}/mprof-report
@@ -1455,7 +1424,6 @@ Requires:       mono-devel = %{version}
 Requires:       mono-extras = %{version}
 Requires:       mono-locale-extras = %{version}
 Requires:       mono-mvc = %{version}
-Requires:       mono-nunit = %{version}
 Requires:       mono-reactive = %{version}
 Requires:       mono-wcf = %{version}
 Requires:       mono-web = %{version}
